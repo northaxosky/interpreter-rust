@@ -38,7 +38,7 @@ fn scan(source: &str) -> (Vec<Token>, bool) {
     let mut tokens = Vec::new();
     let mut had_error = false;
     let mut chars = source.chars().peekable();
-    let line = 1;
+    let mut line = 1;
 
     while let Some(c) = chars.next() {
         match c {
@@ -100,6 +100,12 @@ fn scan(source: &str) -> (Vec<Token>, bool) {
                     tokens.push(Token::new(TokenType::Slash, c.to_string(), line));
                 }
             }
+
+            // Whitespace: ignore, don't produce a token
+            ' ' | '\t' | '\r' => {}
+            // Newline: ignore, but advance the line counter
+            '\n' => line += 1,
+
             // Unexpected Character
             _ => {
                 eprintln!("[line {line}] Error: Unexpected character: {c}");
