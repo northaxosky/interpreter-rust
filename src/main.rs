@@ -1,4 +1,6 @@
+mod scanner;
 mod token;
+use scanner::Scanner;
 use std::{env, fs};
 use token::{Literal, Token, TokenType};
 
@@ -19,9 +21,10 @@ fn main() {
                 String::new()
             });
 
-            let (tokens, had_error) = scan(&file_contents);
-            for t in &tokens {
-                println!("{t}");
+            let scanner = Scanner::new(&file_contents);
+            let (tokens, had_error) = Scanner::scan_tokens(scanner);
+            for tok in tokens {
+                println!("{tok}")
             }
 
             if had_error {
@@ -134,11 +137,6 @@ fn scan(source: &str) -> (Vec<Token>, bool) {
                     }
                 }
             }
-
-            // Whitespace: ignore, don't produce a token
-            ' ' | '\t' | '\r' => {}
-            // Newline: ignore, but advance the line counter
-            '\n' => line += 1,
 
             // Unexpected Character
             _ => {
