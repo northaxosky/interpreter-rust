@@ -14,6 +14,7 @@ pub enum TokenType {
     Semicolon,
     Slash,
     Star,
+
     Equal,
     EqualEqual,
     Bang,
@@ -22,6 +23,10 @@ pub enum TokenType {
     LessEqual,
     Greater,
     GreaterEqual,
+
+    String,
+    Number,
+
     Eof,
 }
 
@@ -48,8 +53,31 @@ impl fmt::Display for TokenType {
             TokenType::Greater => "GREATER",
             TokenType::GreaterEqual => "GREATER_EQUAL",
             TokenType::Eof => "EOF",
+            TokenType::String => "STRING",
+            TokenType::Number => "NUMBER",
         };
         write!(f, "{name}")
+    }
+}
+
+#[derive(Debug, Clone)]
+pub enum Literal {
+    Str(String),
+    Num(f64),
+}
+
+impl fmt::Display for Literal {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Literal::Str(n) => write!(f, "{n}"),
+            Literal::Num(n) => {
+                if n.fract() == 0.0 {
+                    write!(f, "{n:.1}") // Integer: force one decimal
+                } else {
+                    write!(f, "{n}")
+                }
+            }
+        }
     }
 }
 
@@ -58,6 +86,7 @@ pub struct Token {
     pub token_type: TokenType,
     pub lexeme: String,
     pub line: usize,
+    pub literal: Option<Literal>,
 }
 
 impl Token {
@@ -66,12 +95,30 @@ impl Token {
             token_type,
             lexeme,
             line,
+            literal: None,
+        }
+    }
+
+    pub fn with_literal(
+        token_type: TokenType,
+        lexeme: String,
+        line: usize,
+        literal: Option<Literal>,
+    ) -> Self {
+        Token {
+            token_type,
+            lexeme,
+            line,
+            literal,
         }
     }
 }
 
 impl fmt::Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{} {} null", self.token_type, self.lexeme)
+        match &self.literal {
+            Some(lit) => write!(f, "{} {} {}", self.token_type, self.lexeme, lit),
+            None => write!(f, "{} {} null", self.token_type, self.lexeme),
+        }
     }
 }

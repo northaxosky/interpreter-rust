@@ -1,6 +1,6 @@
 mod token;
 use std::{env, fs};
-use token::{Token, TokenType};
+use token::{Literal, Token, TokenType};
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -98,6 +98,40 @@ fn scan(source: &str) -> (Vec<Token>, bool) {
                     }
                 } else {
                     tokens.push(Token::new(TokenType::Slash, c.to_string(), line));
+                }
+            }
+
+            // Literals: Strings & Numbers
+            '"' => {
+                let mut val = String::new();
+                loop {
+                    match chars.next() {
+                        Some('"') => {
+                            // End of string, build value
+                            let lexeme = format!("\"{val}\"");
+                            let literal = Some(Literal::Str(val));
+                            tokens.push(Token::with_literal(
+                                TokenType::String,
+                                lexeme,
+                                line,
+                                literal,
+                            ));
+                            break;
+                        }
+                        Some('\n') => {
+                            // New line, increment line
+                            line += 1;
+                            val.push('\n');
+                        }
+                        Some(ch) => {
+                            val.push(ch);
+                        }
+                        None => {
+                            eprintln!("[line {line}] Error: Unterminated string.");
+                            had_error = true;
+                            break;
+                        }
+                    }
                 }
             }
 
