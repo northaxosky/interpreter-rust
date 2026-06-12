@@ -96,8 +96,9 @@ fn scan(source: &str) -> (Vec<Token>, bool) {
                         }
                         chars.next();
                     }
+                } else {
+                    tokens.push(Token::new(TokenType::Slash, c.to_string(), line));
                 }
-                tokens.push(Token::new(TokenType::Slash, c.to_string(), line));
             }
             // Unexpected Character
             _ => {
