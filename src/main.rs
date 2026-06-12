@@ -35,7 +35,7 @@ fn main() {
                     ';' => println!("SEMICOLON ; null"),
                     '/' => println!("SLASH / null"),
                     '*' => println!("STAR * null"),
-                    _ => {}
+                    _ => println!("Error: Unexpected character: {c}"),
                 }
             }
             println!("EOF  null");
