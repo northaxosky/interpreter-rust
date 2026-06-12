@@ -85,6 +85,8 @@ impl Scanner {
                         }
                         self.peek_next();
                     }
+                } else {
+                    self.add_token(TokenType::Slash);
                 }
             }
 
