@@ -16,6 +16,8 @@ pub enum TokenType {
     Star,
     Equal,
     EqualEqual,
+    Bang,
+    BangEqual,
     Eof,
 }
 
@@ -35,6 +37,8 @@ impl fmt::Display for TokenType {
             TokenType::Star => "STAR",
             TokenType::Equal => "EQUAL",
             TokenType::EqualEqual => "EQUAL_EQUAL",
+            TokenType::Bang => "BANG",
+            TokenType::BangEqual => "BANG_EQUAL",
             TokenType::Eof => "EOF",
         };
         write!(f, "{name}")
