@@ -72,6 +72,22 @@ fn scan(source: &str) -> (Vec<Token>, bool) {
                     tokens.push(Token::new(TokenType::Bang, c.to_string(), line));
                 }
             }
+            '<' => {
+                if chars.peek() == Some(&'=') {
+                    chars.next();
+                    tokens.push(Token::new(TokenType::LessEqual, "<=".to_string(), line));
+                } else {
+                    tokens.push(Token::new(TokenType::Less, c.to_string(), line));
+                }
+            }
+            '>' => {
+                if chars.peek() == Some(&'=') {
+                    chars.next();
+                    tokens.push(Token::new(TokenType::GreaterEqual, ">=".to_string(), line));
+                } else {
+                    tokens.push(Token::new(TokenType::Greater, c.to_string(), line));
+                }
+            }
 
             // Unexpected Character
             _ => {
