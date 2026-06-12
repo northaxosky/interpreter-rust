@@ -22,18 +22,14 @@ fn main() {
                 String::new()
             });
 
-            if !file_contents.is_empty() {
-                panic!("Scanner not implemented");
-            } else {
-                for c in file_contents.chars() {
-                    match c {
-                        '(' => println!("LEFT_PAREN ( null"),
-                        ')' => println!("RIGHT_PAREN ) null"),
-                        _ => {}
-                    }
+            for c in file_contents.chars() {
+                match c {
+                    '(' => println!("LEFT_PAREN ( null"),
+                    ')' => println!("RIGHT_PAREN ) null"),
+                    _ => {}
                 }
-                println!("EOF  null");
             }
+            println!("EOF  null");
         }
         _ => {
             eprintln!("Unknown command: {}", command);
