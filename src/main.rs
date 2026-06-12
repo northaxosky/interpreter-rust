@@ -1,6 +1,6 @@
-#![allow(unused_variables)]
-use std::env;
-use std::fs;
+mod token;
+use std::{env, fs};
+use token::{Token, TokenType};
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -14,35 +14,15 @@ fn main() {
 
     match command.as_str() {
         "tokenize" => {
-            // You can use print statements as follows for debugging, they'll be visible when running tests.
-            eprintln!("Logs from your program will appear here!");
-
             let file_contents = fs::read_to_string(filename).unwrap_or_else(|_| {
                 eprintln!("Failed to read file {}", filename);
                 String::new()
             });
 
-            let mut had_error = false;
-            for c in file_contents.chars() {
-                match c {
-                    '(' => println!("LEFT_PAREN ( null"),
-                    ')' => println!("RIGHT_PAREN ) null"),
-                    '{' => println!("LEFT_BRACE {{ null"),
-                    '}' => println!("RIGHT_BRACE }} null"),
-                    ',' => println!("COMMA , null"),
-                    '.' => println!("DOT . null"),
-                    '-' => println!("MINUS - null"),
-                    '+' => println!("PLUS + null"),
-                    ';' => println!("SEMICOLON ; null"),
-                    '/' => println!("SLASH / null"),
-                    '*' => println!("STAR * null"),
-                    _ => {
-                        eprintln!("[line 1] Error: Unexpected character: {c}");
-                        had_error = true;
-                    }
-                }
+            let (tokens, had_error) = scan(&file_contents);
+            for t in &tokens {
+                println!("{t}");
             }
-            println!("EOF  null");
 
             if had_error {
                 std::process::exit(65);
@@ -52,4 +32,47 @@ fn main() {
             eprintln!("Unknown command: {}", command);
         }
     }
+}
+
+fn scan(source: &str) -> (Vec<Token>, bool) {
+    let mut tokens = Vec::new();
+    let mut had_error = false;
+    let mut chars = source.chars().peekable();
+    let line = 1;
+
+    while let Some(c) = chars.next() {
+        match c {
+            // 1 Char: Simple case
+            '(' => tokens.push(Token::new(TokenType::LeftParen, c.to_string(), line)),
+            ')' => tokens.push(Token::new(TokenType::RightParen, c.to_string(), line)),
+            '{' => tokens.push(Token::new(TokenType::LeftBrace, c.to_string(), line)),
+            '}' => tokens.push(Token::new(TokenType::RightBrace, c.to_string(), line)),
+            ',' => tokens.push(Token::new(TokenType::Comma, c.to_string(), line)),
+            '.' => tokens.push(Token::new(TokenType::Dot, c.to_string(), line)),
+            '-' => tokens.push(Token::new(TokenType::Minus, c.to_string(), line)),
+            '+' => tokens.push(Token::new(TokenType::Plus, c.to_string(), line)),
+            ';' => tokens.push(Token::new(TokenType::Semicolon, c.to_string(), line)),
+            '/' => tokens.push(Token::new(TokenType::Slash, c.to_string(), line)),
+            '*' => tokens.push(Token::new(TokenType::Star, c.to_string(), line)),
+
+            // 2 Chars: Forward peak next char using peek()
+            '=' => {
+                if chars.peek() == Some(&'=') {
+                    chars.next();
+                    tokens.push(Token::new(TokenType::EqualEqual, "==".to_string(), line));
+                } else {
+                    tokens.push(Token::new(TokenType::Equal, c.to_string(), line));
+                }
+            }
+
+            // Unexpected Character
+            _ => {
+                eprintln!("[line {line}] Error: Unexpected character: {c}");
+                had_error = true;
+            }
+        }
+    }
+
+    tokens.push(Token::new(TokenType::Eof, String::new(), line));
+    (tokens, had_error)
 }
