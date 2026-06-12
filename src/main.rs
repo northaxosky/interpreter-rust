@@ -52,7 +52,6 @@ fn scan(source: &str) -> (Vec<Token>, bool) {
             '-' => tokens.push(Token::new(TokenType::Minus, c.to_string(), line)),
             '+' => tokens.push(Token::new(TokenType::Plus, c.to_string(), line)),
             ';' => tokens.push(Token::new(TokenType::Semicolon, c.to_string(), line)),
-            '/' => tokens.push(Token::new(TokenType::Slash, c.to_string(), line)),
             '*' => tokens.push(Token::new(TokenType::Star, c.to_string(), line)),
 
             // 2 Chars: Forward peak next char using peek()
@@ -88,7 +87,18 @@ fn scan(source: &str) -> (Vec<Token>, bool) {
                     tokens.push(Token::new(TokenType::Greater, c.to_string(), line));
                 }
             }
-
+            '/' => {
+                if chars.peek() == Some(&'/') {
+                    // It's a comment, skip this line
+                    while let Some(&next) = chars.peek() {
+                        if next == '\n' {
+                            break;
+                        }
+                        chars.next();
+                    }
+                }
+                tokens.push(Token::new(TokenType::Slash, c.to_string(), line));
+            }
             // Unexpected Character
             _ => {
                 eprintln!("[line {line}] Error: Unexpected character: {c}");
