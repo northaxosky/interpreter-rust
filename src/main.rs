@@ -25,7 +25,14 @@ fn main() {
             if !file_contents.is_empty() {
                 panic!("Scanner not implemented");
             } else {
-                println!("EOF  null"); // Placeholder, replace this line when implementing the scanner
+                for c in file_contents.chars() {
+                    match c {
+                        '(' => println!("LEFT_PAREN ( null"),
+                        ')' => println!("RIGHT_PAREN ) null"),
+                        _ => {}
+                    }
+                }
+                println!("EOF  null");
             }
         }
         _ => {
