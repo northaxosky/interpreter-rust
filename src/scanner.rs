@@ -80,10 +80,9 @@ impl Scanner {
                 if self.match_char('/') {
                     while let Some(c) = self.peek() {
                         if c == '\n' {
-                            self.line += 1;
                             break;
                         }
-                        self.peek_next();
+                        self.advance();
                     }
                 } else {
                     self.add_token(TokenType::Slash);
@@ -94,7 +93,7 @@ impl Scanner {
             '"' => self.string(),
             c if c.is_ascii_digit() => self.number(),
 
-            // Whitespace: specific interactions
+            // Whitespace: skip or advance line
             ' ' | '\t' | '\r' => {}
             '\n' => self.line += 1,
 
@@ -107,9 +106,44 @@ impl Scanner {
     }
 
     // Literal constructors
-    fn string(&mut self) {}
+    fn string(&mut self) {
+        while self.peek() != Some('"') && !self.is_at_end() {
+            if self.peek() == Some('\n') {
+                self.line += 1;
+            }
+            self.advance();
+        }
 
-    fn number(&mut self) {}
+        if self.is_at_end() {
+            eprintln!("[line {}] Error: Unterminated string.", self.line);
+            self.had_error = true;
+            return;
+        }
+        self.advance();
+
+        let value: String = self.source[self.start + 1..self.current - 1]
+            .iter()
+            .collect();
+        self.add_token_literal(TokenType::String, Literal::Str(value));
+    }
+
+    fn number(&mut self) {
+        while matches!(self.peek(), Some(c) if c.is_ascii_digit()) {
+            self.advance();
+        }
+
+        // fractional part: a '.' followed by a digit
+        if self.peek() == Some('.') && matches!(self.peek_next(), Some(c) if c.is_ascii_digit()) {
+            self.advance();
+            while matches!(self.peek(), Some(c) if c.is_ascii_digit()) {
+                self.advance();
+            }
+        }
+
+        let lexeme: String = self.source[self.start..self.current].iter().collect();
+        let value: f64 = lexeme.parse().unwrap();
+        self.add_token_literal(TokenType::Number, Literal::Num(value));
+    }
 
     // Minor helper functions
     fn is_at_end(&self) -> bool {

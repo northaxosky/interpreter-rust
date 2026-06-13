@@ -20,8 +20,7 @@ fn main() {
                 String::new()
             });
 
-            let scanner = Scanner::new(&file_contents);
-            let (tokens, had_error) = Scanner::scan_tokens(scanner);
+            let (tokens, had_error) = Scanner::new(&file_contents).scan_tokens();
             for tok in tokens {
                 println!("{tok}")
             }
