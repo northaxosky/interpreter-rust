@@ -3,6 +3,7 @@ use std::fmt;
 #[derive(Debug, Clone)]
 // Alternatively: #[strum(serialize_all = "SCREAMING_SNAKE_CASE")]
 pub enum TokenType {
+    // 1 Char
     LeftParen,
     RightParen,
     LeftBrace,
@@ -15,6 +16,7 @@ pub enum TokenType {
     Slash,
     Star,
 
+    // 2 Chars
     Equal,
     EqualEqual,
     Bang,
@@ -24,8 +26,28 @@ pub enum TokenType {
     Greater,
     GreaterEqual,
 
+    // Literals
     String,
     Number,
+
+    // Keywords & Identifier
+    And,
+    Class,
+    Else,
+    False,
+    For,
+    Fun,
+    If,
+    Nil,
+    Or,
+    Print,
+    Return,
+    Super,
+    This,
+    True,
+    Var,
+    While,
+    Identifier,
 
     Eof,
 }
@@ -55,6 +77,23 @@ impl fmt::Display for TokenType {
             TokenType::Eof => "EOF",
             TokenType::String => "STRING",
             TokenType::Number => "NUMBER",
+            TokenType::And => "AND",
+            TokenType::Class => "CLASS",
+            TokenType::Else => "ELSE",
+            TokenType::False => "FALSE",
+            TokenType::For => "FOR",
+            TokenType::Fun => "FUN",
+            TokenType::If => "IF",
+            TokenType::Nil => "NIL",
+            TokenType::Or => "OR",
+            TokenType::Print => "PRINT",
+            TokenType::Return => "RETURN",
+            TokenType::Super => "SUPER",
+            TokenType::This => "THIS",
+            TokenType::True => "TRUE",
+            TokenType::Var => "VAR",
+            TokenType::While => "WHILE",
+            TokenType::Identifier => "IDENTIFIER",
         };
         write!(f, "{name}")
     }

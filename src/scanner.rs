@@ -10,6 +10,14 @@ pub struct Scanner {
     had_error: bool,
 }
 
+fn is_alpha(c: char) -> bool {
+    c.is_ascii_alphabetic() || c == '_'
+}
+
+fn is_alpha_numeric(c: char) -> bool {
+    is_alpha(c) || c.is_ascii_digit()
+}
+
 impl Scanner {
     pub fn new(source: &str) -> Self {
         Self {
@@ -89,9 +97,10 @@ impl Scanner {
                 }
             }
 
-            // Literals: string & numbers
+            // Values: literal string & numbers, identifers & keywords
             '"' => self.string(),
             c if c.is_ascii_digit() => self.number(),
+            c if is_alpha(c) => self.identifier(),
 
             // Whitespace: skip or advance line
             ' ' | '\t' | '\r' => {}
@@ -143,6 +152,34 @@ impl Scanner {
         let lexeme: String = self.source[self.start..self.current].iter().collect();
         let value: f64 = lexeme.parse().unwrap();
         self.add_token_literal(TokenType::Number, Literal::Num(value));
+    }
+
+    fn identifier(&mut self) {
+        while matches!(self.peek(), Some(c) if is_alpha_numeric(c)) {
+            self.advance();
+        }
+
+        let lexeme: String = self.source[self.start..self.current].iter().collect();
+        let token_type = match lexeme.as_str() {
+            "and" => TokenType::And,
+            "class" => TokenType::Class,
+            "else" => TokenType::Else,
+            "false" => TokenType::False,
+            "for" => TokenType::For,
+            "fun" => TokenType::Fun,
+            "if" => TokenType::If,
+            "nil" => TokenType::Nil,
+            "or" => TokenType::Or,
+            "print" => TokenType::Print,
+            "return" => TokenType::Return,
+            "super" => TokenType::Super,
+            "this" => TokenType::This,
+            "true" => TokenType::True,
+            "var" => TokenType::Var,
+            "while" => TokenType::While,
+            _ => TokenType::Identifier, // not a keyword -> plain identifier
+        };
+        self.add_token(token_type);
     }
 
     // Minor helper functions
