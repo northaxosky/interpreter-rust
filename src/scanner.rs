@@ -10,6 +10,7 @@ pub struct Scanner {
     had_error: bool,
 }
 
+// Minor helper free functions
 fn is_alpha(c: char) -> bool {
     c.is_ascii_alphabetic() || c == '_'
 }
