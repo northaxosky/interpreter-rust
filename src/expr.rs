@@ -1,5 +1,5 @@
 use std::fmt;
-
+#[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub enum Expr {
     Literal(LiteralValue),
@@ -11,6 +11,7 @@ impl fmt::Display for Expr {
     }
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub enum LiteralValue {
     Bool(bool),
